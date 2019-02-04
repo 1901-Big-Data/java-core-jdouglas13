@@ -1,8 +1,12 @@
 package com.revature.eval.java.core;
 
 import java.time.temporal.Temporal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class EvaluationService {
 
@@ -30,8 +34,15 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String acronym(String phrase) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		
+		StringBuilder acronym = new StringBuilder();
+		
+		String[] phraseArray = phrase.split(" |-");
+		
+		for (String wordInPhrase : phraseArray)
+			acronym.append(wordInPhrase.substring(0, 1));
+								
+		return acronym.toString().toUpperCase();
 	}
 
 	/**
@@ -85,16 +96,22 @@ public class EvaluationService {
 
 		public boolean isEquilateral() {
 			// TODO Write an implementation for this method declaration
+			if (sideOne == sideTwo && sideTwo == sideThree)
+				return true;
 			return false;
 		}
 
 		public boolean isIsosceles() {
 			// TODO Write an implementation for this method declaration
+			if (sideOne == sideTwo || sideOne == sideThree)
+				return true;
 			return false;
 		}
 
 		public boolean isScalene() {
 			// TODO Write an implementation for this method declaration
+			if (sideOne != sideTwo && sideOne != sideThree)
+				return true;
 			return false;
 		}
 
@@ -116,8 +133,58 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getScrabbleScore(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		string = string.toUpperCase();
+		
+		char[] chArray = string.toCharArray();
+		
+		int scrabbleScore = 0;
+		
+		for (char c : chArray) {
+			
+			switch(c) {
+				case 'A':
+				case 'E':
+				case 'I':
+				case 'O':
+				case 'U':
+				case 'L':
+				case 'N':
+				case 'R':
+				case 'S':
+				case 'T':
+					scrabbleScore += 1;
+					break;
+				case 'D':
+				case 'G':
+					scrabbleScore += 2;
+					break;
+				case 'B':
+				case 'C':
+				case 'M':
+				case 'P':
+					scrabbleScore += 3;
+					break;
+				case 'F':
+				case 'H':
+				case 'V':
+				case 'W':
+				case 'Y':
+					scrabbleScore += 4;
+					break;
+				case 'K':
+					scrabbleScore += 5;
+					break;
+				case 'J':
+				case 'X':
+					scrabbleScore += 8;
+					break;
+				case 'Q':
+				case 'Z':
+					scrabbleScore += 10;
+					break;
+			}
+		}
+		return scrabbleScore;
 	}
 
 	/**
@@ -152,8 +219,23 @@ public class EvaluationService {
 	 * NANP-countries, only 1 is considered a valid country code.
 	 */
 	public String cleanPhoneNumber(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		
+		// if string contains whitespace or a non-word character, replace with empty string
+		string = string.replaceAll("[()\\s-.]", "");
+	
+		if (string.length() > 11) {
+			throw new IllegalArgumentException("Includes too many digits in telephone number");
+	    }
+		
+		// if string contains non-digit characters, throw exception
+		if (string.contains("[\\D]")) {
+			throw new IllegalArgumentException("Telephone number includes non-digit characters");
+	    }
+		
+		if (string.substring(0) == "1")
+			string = string.substring(1);
+		
+		return string;
 	}
 
 	/**
@@ -166,8 +248,30 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Map<String, Integer> wordCount(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		
+		// find characters that are not word characters and replace with whitespace
+		string = string.replaceAll("[\\W]", " ");
+		String[] words = string.split(" ");
+		
+		for (int i = 0; i < words.length; i++) {
+			String key = words[i].toLowerCase();
+			
+			if (key.length() > 0) {
+				// if HashMap does not contain key, add  to the HashMap
+				if (!map.containsKey(key)) {
+					map.put(key, 1);
+				}
+				// key does exist in HashMap, get value, increment key's value by 1, put back in HashMap
+				else {
+					int value = map.get(key);
+					value++;
+					map.put(key, value);
+				}
+			}
+		}
+		return map;
 	}
 
 	/**
@@ -247,6 +351,7 @@ public class EvaluationService {
 	 */
 	public String toPigLatin(String string) {
 		// TODO Write an implementation for this method declaration
+		
 		return null;
 	}
 
@@ -267,7 +372,26 @@ public class EvaluationService {
 	 */
 	public boolean isArmstrongNumber(int input) {
 		// TODO Write an implementation for this method declaration
-		return false;
+		int startingNumber = input;
+		
+		String numberInQuestion = Integer.toString(input);
+		
+		char[] numbersInStartingNumber = numberInQuestion.toCharArray();
+		
+		int exponent = numbersInStartingNumber.length;
+		
+		int total = 0;
+		for (int i = 0; i < numbersInStartingNumber.length; i++) {
+			 int multiplier = Character.getNumericValue(numbersInStartingNumber[i]);
+			 int value = (int) Math.pow(multiplier, exponent);
+			 total = total + value;
+		}
+		
+		if (total == startingNumber) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -281,8 +405,29 @@ public class EvaluationService {
 	 * @return
 	 */
 	public List<Long> calculatePrimeFactorsOf(long l) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		ArrayList<Long> primeFactors = new ArrayList<Long>();
+		
+		long dividend = l;
+		long primeFactor = 0;
+		
+		for (long divisor = 2; divisor <= dividend / divisor; ) {
+			
+			if (dividend % divisor == 0) {
+				primeFactor = divisor;
+				primeFactors.add(primeFactor);
+				dividend /= divisor;
+			} else {
+				divisor++;
+			}
+		}
+		
+		if (primeFactor < dividend) {
+			primeFactors.add(dividend);
+		} else {
+			primeFactors.add(primeFactor);
+		}
+		
+		return primeFactors;
 	}
 
 	/**
@@ -339,8 +484,33 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int calculateNthPrime(int i) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		ArrayList<Integer> primes = new ArrayList<Integer>();
+		
+		int count = 0;
+		int numberToBeTestedForPrimeness = 2;
+		
+		if (i < 1)
+			throw new IllegalArgumentException("An argument passed to calculateNthPrime must be > 0");
+		
+		while (count < i + 1) {
+			
+			boolean isPrime = true;
+			
+			// test if numberBeingTested is prime
+			for (int divisor = 2; divisor <= numberToBeTestedForPrimeness / 2; divisor++) {
+				if (numberToBeTestedForPrimeness % divisor == 0) {
+					isPrime = false;
+					break;
+				}
+			}
+			
+			if (isPrime) {
+				count++;
+				primes.add(numberToBeTestedForPrimeness);
+			}
+			numberToBeTestedForPrimeness++;
+		}
+		return primes.get((i - 1)).intValue();
 	}
 
 	/**
@@ -465,7 +635,25 @@ public class EvaluationService {
 	 */
 	public int getSumOfMultiples(int i, int[] set) {
 		// TODO Write an implementation for this method declaration
-		return 0;
+		ArrayList<Integer> multiples = new ArrayList<>();
+		
+		Integer sumOfTheMultiples = 0;
+				
+		
+		for (int number : set) {
+			for (int dividend = 0; dividend < i; dividend++) {
+				if (dividend % number == 0)
+					multiples.add(number * ((Collections.frequency(multiples, number)+ 1)));
+			}
+		}
+		
+		List<Integer> newList = multiples.stream().distinct().collect(Collectors.toList()); 
+		
+		for (Integer n : newList) {
+			sumOfTheMultiples += n;
+		}
+		
+		return sumOfTheMultiples;
 	}
 
 	/**
